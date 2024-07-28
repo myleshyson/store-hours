@@ -55,6 +55,12 @@ class Field extends \craft\base\Field
     public $slots;
 
     /**
+     * @var int|null $startDay
+     * @since 4.1.0
+     */
+    public ?int $startDay = null;
+
+    /**
      * @inheritdoc
      */
     public function init(): void
@@ -120,19 +126,36 @@ JS, [
             $columns,
         ]);
 
-        return Cp::editableTableFieldHtml([
-            'label' => Craft::t('store-hours', 'Time Slots'),
-            'instructions' => Craft::t('store-hours', 'Define the time slots that authors should be able to fill times in for.'),
-            'id' => 'slots',
-            'name' => 'slots',
-            'cols' => $columns,
-            'rows' => $this->slots,
-            'allowAdd' => true,
-            'allowReorder' => true,
-            'allowDelete' => true,
-            'addRowLabel' => Craft::t('store-hours', 'Add a time slot'),
-            'initJs' => false,
-        ]);
+        $locale = Craft::$app->getLocale();
+
+        return
+            Cp::editableTableFieldHtml([
+                'label' => Craft::t('store-hours', 'Time Slots'),
+                'instructions' => Craft::t('store-hours', 'Define the time slots that authors should be able to fill times in for.'),
+                'id' => 'slots',
+                'name' => 'slots',
+                'cols' => $columns,
+                'rows' => $this->slots,
+                'allowAdd' => true,
+                'allowReorder' => true,
+                'allowDelete' => true,
+                'addRowLabel' => Craft::t('store-hours', 'Add a time slot'),
+                'initJs' => false,
+            ]) .
+            Cp::selectFieldHtml([
+                'label' => Craft::t('store-hours', 'Start Day'),
+                'instructions' => Craft::t('store-hours', 'Choose which day the field should start with.'),
+                'id' => 'start-day',
+                'name' => 'startDay',
+                'options' => [
+                    ['value' => '', 'label' => Craft::t('store-hours', 'Same as user’s preference')],
+                    ...array_map(
+                        fn(int $day) => ['value' => $day, 'label' => $locale->getWeekDayName($day, Locale::LENGTH_FULL)],
+                        $this->dayRange(false),
+                    ),
+                ],
+                'value' => $this->startDay,
+            ]);
     }
 
     /**
@@ -245,19 +268,10 @@ JS, [
             ];
         }
 
-        // Get the day key order per the user's Week Start Day pref
-        /** @var User $user */
-        $user = Craft::$app->getUser()->getIdentity();
-        $startDay = (int)($user->getPreference('weekStartDay') ?? Craft::$app->getConfig()->getGeneral()->defaultWeekStartDay);
-        $days = range($startDay, 6, 1);
-        if ($startDay !== 0) {
-            $days = array_merge($days, range(0, $startDay - 1, -1));
-        }
-
         // Build out the editable table rows, explicitly setting each cell value to an array with a 'value' key
         $locale = Craft::$app->getLocale();
         $rows = [];
-        foreach ($days as $day) {
+        foreach ($this->dayRange(true) as $day) {
             $row = [
                 'day' => $locale->getWeekDayName($day, Locale::LENGTH_FULL),
             ];
@@ -303,5 +317,23 @@ JS, [
             'name' => $typeName,
             'fields' => fn() => Day::prepareFieldDefinition($this->slots),
         ])));
+    }
+
+    private function dayRange(bool $useFieldValue): array
+    {
+        if ($useFieldValue && isset($this->startDay)) {
+            $startDay = $this->startDay;
+        } else {
+            /** @var User $user */
+            $user = Craft::$app->getUser()->getIdentity();
+            $startDay = (int)($user->getPreference('weekStartDay') ?? Craft::$app->getConfig()->getGeneral()->defaultWeekStartDay);
+        }
+
+        $days = range($startDay, 6);
+        if ($startDay !== 0) {
+            $days = array_merge($days, range(0, $startDay - 1, -1));
+        }
+
+        return $days;
     }
 }

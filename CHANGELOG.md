@@ -1,6 +1,7 @@
 # Release Notes for Store Hours
 
 ## Unreleased
+- Added the “Start Day” field setting. ([#43](https://github.com/craftcms/store-hours/issues/43))
 - Store Hours fields now get clock icons.
 
 ## 4.0.1 - 2024-03-18
