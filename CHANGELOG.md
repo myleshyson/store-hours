@@ -1,5 +1,8 @@
 # Release Notes for Store Hours
 
+## 4.2.0 - 2024-07-28
+- Added `craft\storehours\data\FieldData::getGroupedRanges()`.
+
 ## 4.1.0 - 2024-07-28
 - Added the “Start Day” field setting. ([#43](https://github.com/craftcms/store-hours/issues/43))
 - Added `craft\storehours\data\FieldData::getIsOpen()`. ([#37](https://github.com/craftcms/store-hours/issues/37))

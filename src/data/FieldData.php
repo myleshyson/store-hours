@@ -198,7 +198,31 @@ class FieldData extends \ArrayObject
             array_slice($data, 0, $end + 1)
         );
     }
-    
+
+    /**
+     * Returns a range of the days, grouped by consecutive days that have the same time slot values.
+     *
+     * @param int $start The first day to return
+     * @param int|null $end The last day to return. If null, it will be whatever day comes before `$start`.
+     * @return DayData[][]
+     */
+    public function getGroupedRanges(int $start, int $end = null): array
+    {
+        $range = $this->getRange($start, $end);
+        $groups = [];
+        $lastSlotKey = null;
+        foreach ($range as $day) {
+            /** @phpstan-ignore-next-line */
+            $slotKey = implode('-', array_map(fn(?DateTime $slot) => $slot ? $this->minuteOfDay($slot) : 'null', (array)$day));
+            if ($slotKey !== $lastSlotKey) {
+                $groups[] = [];
+                $lastSlotKey = $slotKey;
+            }
+            $groups[count($groups) - 1][] = $day;
+        }
+        return $groups;
+    }
+
     /**
      * Returns whether any day has any time slots filled in.
      *

@@ -115,6 +115,36 @@ To only show certain days of the week (e.g only Monday through Friday), use the 
 {% endfor %}
 ```
 
+### Showing Grouped Ranges
+
+You can show consolidated list of hours, such as:
+
+> **11am** – **6pm** Mon – Fri
+> **11am** – **5pm** Sat – Sun
+
+To do that, use the `getGroupedRanges()` field method, which is similar to `getRange()`, except the resulting days are grouped by their time slots.
+
+```twig
+<ul>
+  {% for group in entry.<FieldHandle>.getGroupedRanges(1) %}
+    {% set first = group|first %}
+    {% set last = group|last %}
+    {% if first.open and first.close %}
+      <li>
+        <strong>
+          {{ first.open|date('g:sa')|replace(':00', '') }}&hairsp;–&hairsp;{{ first.close|date('g:sa')|replace(':00', '') }}
+        </strong>
+        {% if first != last %}
+          {{ first.getName('medium') }}&hairsp;–&hairsp;{{ last.getName('medium') }}
+        {% else %}
+          {{ first.getName('medium') }}
+        {% endif %}
+      {% endif %}
+    </li>  
+  {% endfor %}
+</ul>
+```
+
 ### Changing the Week Start Day
 
 You can use the `getRange()` field method to return the full list of days with a different week start day. For example, if you want Monday to be the first day of the week, do this:
