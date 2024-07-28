@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Added the “Start Day” field setting. ([#43](https://github.com/craftcms/store-hours/issues/43))
+- Added `craft\storehours\data\FieldData::getIsOpen()`. ([#37](https://github.com/craftcms/store-hours/issues/37))
 - Store Hours fields now get clock icons.
 
 ## 4.0.1 - 2024-03-18

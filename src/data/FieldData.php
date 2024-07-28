@@ -7,7 +7,10 @@
 
 namespace craft\storehours\data;
 
+use craft\helpers\DateTimeHelper;
 use DateTime;
+use yii\base\InvalidConfigException;
+use yii\base\UnknownPropertyException;
 
 /**
  * Class FieldData
@@ -112,6 +115,38 @@ class FieldData extends \ArrayObject
     public function getTomorrow(): DayData
     {
         return $this->_hoursByDate(new DateTime('+1 day'));
+    }
+
+    /**
+     * Returns whether we are currently within open hours.
+     *
+     * @return bool
+     * @since 4.1.0
+     */
+    public function getIsOpen(): bool
+    {
+        $today = $this->getToday();
+        try {
+            /** @var DateTime|null $open */
+            /** @phpstan-ignore-next-line */
+            $open = $today->open;
+            /** @var DateTime|null $close */
+            /** @phpstan-ignore-next-line */
+            $close = $today->close;
+            /** @phpstan-ignore-next-line */
+        } catch (UnknownPropertyException $e) {
+            throw new InvalidConfigException('Calling getIsOpen() on Store Hours field data is only allowed for fields that define `open` and `close` time slots.', previous: $e);
+        }
+        if (!$open || !$close) {
+            return false;
+        }
+        $now = $this->minuteOfDay(DateTimeHelper::now());
+        return $now >= $this->minuteOfDay($open) && $now < $this->minuteOfDay($close);
+    }
+
+    private function minuteOfDay(DateTime $date): int
+    {
+        return (int)$date->format('G') * 60 + (int)ltrim($date->format('s'), '0');
     }
 
     /**
