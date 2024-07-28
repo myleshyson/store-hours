@@ -1,5 +1,8 @@
 # Release Notes for Store Hours
 
+## Unreleased
+- Store Hours fields now get clock icons.
+
 ## 4.0.1 - 2024-03-18
 - Fixed a PHP error that could occur when editing an element with a Store Hours field.
 

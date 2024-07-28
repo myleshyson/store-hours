@@ -42,6 +42,14 @@ class Field extends \craft\base\Field
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function icon(): string
+    {
+        return 'clock';
+    }
+
+    /**
      * @var array|null The time slots that should be shown in the field
      */
     public $slots;
