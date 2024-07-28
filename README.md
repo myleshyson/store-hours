@@ -119,7 +119,7 @@ To only show certain days of the week (e.g only Monday through Friday), use the 
 
 You can show consolidated list of hours, such as:
 
-> **11am** – **6pm** Mon – Fri
+> **11am** – **6pm** Mon – Fri\
 > **11am** – **5pm** Sat – Sun
 
 To do that, use the `getGroupedRanges()` field method, which is similar to `getRange()`, except the resulting days are grouped by their time slots.
